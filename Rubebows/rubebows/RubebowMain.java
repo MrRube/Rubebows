@@ -32,19 +32,20 @@ import envEff.Util.PlugInCreation.EnvEntityClient;
 import envEff.Util.PlugInCreation.EnvEntityServer;
 import envEff.Util.PlugInCreation.IEffectHandlers;
 
-@Mod(modid = "Rubebow", name = "Rube's Rainbows for Mr. Rube's Environmental Effect API", version = "v1.0.0 for Mc 1.6.4")
+@Mod(modid = "Rubebow", name = "Mr. Rube's Rainbows for Minecraft", version = "v1.0.0 for Mc 1.6.4")
 public class RubebowMain implements IEffectHandlers {
 	public static RubebowMain instance;
 	private static boolean canRainbow = false;
 	private static boolean rainWatcher = false;
 	
 	//~~~~~Config Variables~~~~~\\
-	private static float offset = 150;	
+	private static float offset = 250;	
 	public static int baseAl = 64;
 	private static int angleRange = 75;
 	private static int angleFade = 20;
 	private static int fadeTime = 200;
 	private static int life = 600;
+	
 
 	private boolean requestCheck = true;
 
@@ -101,7 +102,7 @@ public class RubebowMain implements IEffectHandlers {
 
 	@Override
 	public void commonTickHandler(WorldServer world) {
-
+		/*
 		if (world.getWorldInfo().isRaining() && !this.rainWatcher) {
 			System.out.println("Watching rain");
 			this.rainWatcher = true;
@@ -143,7 +144,7 @@ public class RubebowMain implements IEffectHandlers {
 				EnvironmentalEffect.registry.clearActiveServerEntites(instance);
 			}
 		}
-
+*/
 	}
 
 	private boolean hasRained(World world) {
@@ -155,8 +156,27 @@ public class RubebowMain implements IEffectHandlers {
 	public void clientTickHandler(WorldClient world) {
 		if (world != null) {
 
+			if (world.getWorldInfo().isRaining() && !this.rainWatcher && !(EnvironmentalEffect.registry.getActiveClientEntites(instance).size() > 0)) {
+				//System.out.println("Watching rain");
+				this.rainWatcher = true;
+			}
+
+			if (this.rainWatcher && !world.getWorldInfo().isRaining()) {
+				rainWatcher = false;
+				//System.out.println("Rainbows Are visable");
+
+				Random rand = new Random(world.getWorldTime());
+					float i = rand.nextFloat()-.75F;					
+					
+				RubebowServerEntity ent = new RubebowServerEntity(i, 0, 0,
+						System.currentTimeMillis());
+				EnvironmentalEffect.registry
+						.addToActiveClientEntites(instance, new RubebowClientEntity(ent));
+
+				
+			}
 			if (this.requestCheck) {
-				NetUtils.sendRequest(instance);
+				
 				this.requestCheck = false;
 			}
 			if (EnvironmentalEffect.registry.getActiveClientEntites(instance)
@@ -170,7 +190,7 @@ public class RubebowMain implements IEffectHandlers {
 				}
 				despawn(EnvironmentalEffect.registry.getActiveClientEntites(
 						instance).get(0), world);
-				//System.out.println(sunAngle);
+				
 
 			}
 		}
@@ -208,7 +228,7 @@ public class RubebowMain implements IEffectHandlers {
 		GLUtil.translateEntPosistionFixedAxis(f, ent, getRenderDirection(),
 				.1F, 0.1F);
 
-		GL11.glScaled(1.5F, 1.5F, 1.5F);
+		GL11.glScaled(2.25F, 2.25F, 2.25F);
 
 		GLUtil.sexyGlowStart();
 		Node[] current;
